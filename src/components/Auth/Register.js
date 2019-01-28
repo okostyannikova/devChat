@@ -19,7 +19,8 @@ export class Register extends Component {
     password: "",
     passwordConfirmation: "",
     errors: [],
-    loading: false
+    loading: false,
+    usersRef: firebase.database().ref("users")
   };
 
   isFormValid = () => {
@@ -83,6 +84,7 @@ export class Register extends Component {
         .createUserWithEmailAndPassword(email, password)
         .then(createdUser => {
           console.log(createdUser);
+
           createdUser.user
             .updateProfile({
               displayName: this.state.username,
@@ -91,6 +93,10 @@ export class Register extends Component {
               )}?d=identicon`
             })
             .then(() => {
+              this.saveUser(createdUser).then(() => {
+                console.log("user saved");
+              });
+
               this.setState({ loading: false });
             })
             .catch(err => {
@@ -102,6 +108,16 @@ export class Register extends Component {
           this.setState({ errors: errors.concat(err), loading: false });
         });
     }
+  };
+
+  saveUser = createdUser => {
+    const { usersRef } = this.state;
+    const { uid: userUid, displayName, photoURL } = createdUser.user;
+
+    return usersRef.child(userUid).set({
+      name: displayName,
+      avatar: photoURL
+    });
   };
 
   render() {
@@ -116,7 +132,7 @@ export class Register extends Component {
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <Grid.Column style={{ maxWidth: 450 }}>
-          <Header as="h2" icon color="orange" textAlign="center">
+          <Header as="h1" icon color="orange" textAlign="center">
             <Icon name="puzzle piece" color="orange" />
             Register for DevChat
           </Header>
