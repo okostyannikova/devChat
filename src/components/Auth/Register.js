@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import firebase from "../../firebase";
+import md5 from "md5";
 import {
   Grid,
   Form,
@@ -82,7 +83,19 @@ export class Register extends Component {
         .createUserWithEmailAndPassword(email, password)
         .then(createdUser => {
           console.log(createdUser);
-          this.setState({ loading: false });
+          createdUser.user
+            .updateProfile({
+              displayName: this.state.username,
+              photoURL: `http://gravatar.com/avatar/${md5(
+                createdUser.user.email
+              )}?d=identicon`
+            })
+            .then(() => {
+              this.setState({ loading: false });
+            })
+            .catch(err => {
+              this.setState({ errors: errors.concat(err), loading: false });
+            });
         })
         .catch(err => {
           console.error(err);
