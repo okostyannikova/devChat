@@ -12,19 +12,32 @@ import {
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import "semantic-ui-css/semantic.min.css";
+import Spinner from "./components/Spinner";
+
+import { createStore, compose } from "redux";
+import { Provider, connect } from "react-redux";
+import { composeWithDevTools } from "redux-devtools-extension";
+import rootReduser from "./reducers";
+import { setUser } from "./actions";
+
+const store = createStore(rootReduser, composeWithDevTools());
 
 class Root extends Component {
   componentDidMount = () => {
-    const { history } = this.props;
+    const { history, setUser } = this.props;
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
+        setUser(user);
         history.push("/");
       }
     });
   };
 
   render() {
-    return (
+    const { isLoading } = this.props;
+    return isLoading ? (
+      <Spinner />
+    ) : (
       <Switch>
         <Route exact path="/" component={App} />
         <Route path="/login" component={Login} />
@@ -34,12 +47,24 @@ class Root extends Component {
   }
 }
 
-const RootWithAuth = withRouter(Root);
+const mapStateToProps = state => ({
+  isLoading: state.user.isLoading
+});
+
+const RootWithAuth = compose(
+  withRouter,
+  connect(
+    mapStateToProps,
+    { setUser }
+  )
+)(Root);
 
 ReactDOM.render(
-  <Router>
-    <RootWithAuth />
-  </Router>,
+  <Provider store={store}>
+    <Router>
+      <RootWithAuth />
+    </Router>
+  </Provider>,
   document.getElementById("root")
 );
 
