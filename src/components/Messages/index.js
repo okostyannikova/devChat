@@ -1,13 +1,22 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
+import { Segment, Comment } from "semantic-ui-react";
+import MessagesHeader from './MessagesHeader'
+import MessageForm from './MessageForm'
 
 class Messages extends Component {
-  static propTypes = {
-    prop: PropTypes
-  };
 
   render() {
-    return <div>Messages</div>;
+    return <React.Fragment>
+      <MessagesHeader/>
+
+      <Segment>
+        <Comment.Group className="messages">
+
+        </Comment.Group>
+      </Segment>
+
+      <MessageForm/>
+    </React.Fragment>
   }
 }
 
