@@ -35,7 +35,6 @@ class UserPanel extends Component {
     firebase
       .auth()
       .signOut()
-      .then(() => console.log("signed out!"));
   };
 
   render() {
