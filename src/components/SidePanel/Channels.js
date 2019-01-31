@@ -30,7 +30,6 @@ class Channels extends Component {
     let loadedChannels = [];
 
     channelsRef.on("child_added", snap => {
-      console.log("hello");
       loadedChannels.push(snap.val());
       this.setState({ channels: loadedChannels }, () => this.setFirstChannel());
     });

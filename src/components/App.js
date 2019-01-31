@@ -15,7 +15,7 @@ const App = ({ currentUser, currentChannel }) => {
       <SidePanel currentUser={currentUser} />
 
       <Grid.Column style={{ marginLeft: 320 }}>
-        <Messages currentChannel={currentChannel} currentUser={currentUser}/>
+        <Messages currentChannel={currentChannel} user={currentUser}/>
       </Grid.Column>
 
       <Grid.Column width={4}>

@@ -6,7 +6,6 @@ import { Segment, Button, Input } from "semantic-ui-react";
 class MessageForm extends Component {
   state = {
     message: "",
-    user: this.props.currentUser,
     loading: false,
     errors: []
   };
@@ -17,7 +16,8 @@ class MessageForm extends Component {
   };
 
   createMessage = () => {
-    const { user, message } = this.state;
+    const { message } = this.state;
+    const { user } = this.props;
     const newMessage = {
       timestamp: firebase.database.ServerValue.TIMESTAMP,
       user: {
@@ -54,13 +54,14 @@ class MessageForm extends Component {
   };
 
   render() {
-    const { errors } = this.state;
+    const { errors, message, loading } = this.state;
 
     return (
       <Segment className="message-form">
         <Input
           fluid
           name="message"
+          value={message}
           onChange={this.handleChange}
           style={{ marginBottom: "0.7em" }}
           label={<Button icon="add" />}
@@ -79,6 +80,7 @@ class MessageForm extends Component {
             content="Add Reply"
             labelPosition="left"
             icon="edit"
+            disabled={loading}
           />
           <Button
             color="teal"
@@ -95,7 +97,7 @@ class MessageForm extends Component {
 MessageForm.propTypes = {
   currentChannel: PropTypes.object,
   messageRef: PropTypes.object,
-  currentUser: PropTypes.object
+  user: PropTypes.object
 };
 
 export default MessageForm;
