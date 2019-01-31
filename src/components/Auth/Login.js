@@ -44,7 +44,6 @@ export class Login extends Component {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then(signedUser => {
-          console.log(signedUser);
           this.setState({ errors: [], loading: false });
         })
         .catch(err => {
