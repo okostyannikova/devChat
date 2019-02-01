@@ -11,7 +11,7 @@ body,
   overflow-y: scroll;
 }
 
-.message-form {
+.message__form {
   position: fixed !important;
   bottom: 1em;
   margin-left: 320px !important;
@@ -20,7 +20,11 @@ body,
   z-index: 200;
 }
 
-.message-self {
+.message__self {
   border-left: 2px solid orange;
   padding-left: 8px;
+}
+
+.message__image {
+  padding: 1em;
 }
