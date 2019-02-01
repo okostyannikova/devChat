@@ -1,9 +1,16 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { Segment, Header, Icon, Input } from "semantic-ui-react";
 
 class MessagesHeader extends Component {
+  handleChange = event => {
+    event.persist();
+    const { handleSearchChange } = this.props;
+    handleSearchChange(event);
+  };
+
   render() {
-    const { channelName, numUniqueUsers } = this.props;
+    const { channelName, numUniqueUsers, searchLoading } = this.props;
     return (
       <Segment clearing>
         {/* Channel Title */}
@@ -17,6 +24,8 @@ class MessagesHeader extends Component {
         {/*  Channel Search Input */}
         <Header floated="right">
           <Input
+            onChange={this.handleChange}
+            loading={searchLoading}
             size="mini"
             icon="search"
             name="serchTerm"
@@ -27,5 +36,12 @@ class MessagesHeader extends Component {
     );
   }
 }
+
+MessagesHeader.propTypes = {
+  channelName: PropTypes.string,
+  numUniqueUsers: PropTypes.string,
+  handleSearchChange: PropTypes.func,
+  searchLoading: PropTypes.bool
+};
 
 export default MessagesHeader;
