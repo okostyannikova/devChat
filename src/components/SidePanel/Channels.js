@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { setCurrentChannel } from "../../actions";
+import { setCurrentChannel, setPrivateChannel } from "../../actions";
 import { Menu, Icon, Modal, Form, Input, Button } from "semantic-ui-react";
 import firebase from "../../firebase";
 
@@ -100,9 +100,10 @@ class Channels extends Component {
   closeModal = () => this.setState({ modal: false });
 
   changeChannel = channel => {
-    const { setCurrentChannel } = this.props;
+    const { setCurrentChannel, setPrivateChannel } = this.props;
     this.setActiveChannel(channel);
     setCurrentChannel(channel);
+    setPrivateChannel(false);
   };
 
   setActiveChannel = channel => {
@@ -178,10 +179,12 @@ class Channels extends Component {
 }
 
 Channels.propTypes = {
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object,
+  setCurrentChannel: PropTypes.func,
+  setPrivateChannel: PropTypes.func
 };
 
 export default connect(
   null,
-  { setCurrentChannel }
+  { setCurrentChannel, setPrivateChannel }
 )(Channels);

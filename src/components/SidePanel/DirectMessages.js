@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import firebase from "../../firebase";
+import { connect } from "react-redux";
+import { setCurrentChannel, setPrivateChannel } from "../../actions";
 import { Menu, Icon } from "semantic-ui-react";
 
 export class DirectMessages extends Component {
@@ -11,7 +13,8 @@ export class DirectMessages extends Component {
     this.presenceRef = firebase.database().ref("presence");
 
     this.state = {
-      users: []
+      users: [],
+      activeChannel: ""
     };
   }
 
@@ -72,8 +75,31 @@ export class DirectMessages extends Component {
 
   isUserOnline = user => user.status === "online";
 
+  changeChannel = user => {
+    const { setCurrentChannel, setPrivateChannel } = this.props;
+    const channelId = this.getChannelId(user.uid);
+    const channelData = {
+      id: channelId,
+      name: user.name
+    };
+    setCurrentChannel(channelData);
+    setPrivateChannel(true);
+    this.setActiveChannel(user.uid);
+  };
+
+  getChannelId = userId => {
+    const currentUserId = this.props.currentUser.uid;
+    return userId < currentUserId
+      ? `${userId}/${currentUserId}`
+      : `${currentUserId}/${userId}`;
+  };
+
+  setActiveChannel = userId => {
+    this.setState({ activeChannel: userId });
+  };
+
   render() {
-    const { users } = this.state;
+    const { users, activeChannel } = this.state;
     return (
       <Menu.Menu className="menu">
         <Menu.Item>
@@ -85,7 +111,8 @@ export class DirectMessages extends Component {
         {users.map(user => (
           <Menu.Item
             key={user.uid}
-            onClick={() => console.log(user)}
+            active={user.uid === activeChannel}
+            onClick={() => this.changeChannel(user)}
             style={{ opacity: 0.7, fontStyle: "italic" }}
           >
             <Icon
@@ -101,7 +128,12 @@ export class DirectMessages extends Component {
 }
 
 DirectMessages.propTypes = {
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object,
+  setCurrentChannel: PropTypes.func,
+  setPrivateChannel: PropTypes.func
 };
 
-export default DirectMessages;
+export default connect(
+  null,
+  { setCurrentChannel, setPrivateChannel }
+)(DirectMessages);

@@ -25,7 +25,8 @@ export const userReduser = (state = initialUserState, { type, payload }) => {
 };
 
 const initialChannelState = {
-  currentChannel: null
+  currentChannel: null,
+  isPrivateChannel: false
 };
 
 export const channelReduser = (state = initialChannelState, { type, payload }) => {
@@ -34,6 +35,11 @@ export const channelReduser = (state = initialChannelState, { type, payload }) =
       return { 
         ...state, 
         currentChannel: payload.currentChannel 
+      };
+    case actionTypes.SET_PRIVATE_CHANNEL:
+      return { 
+        ...state, 
+        isPrivateChannel: payload.isPrivateChannel 
       };
 
     default:

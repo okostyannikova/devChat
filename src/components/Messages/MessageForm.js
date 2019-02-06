@@ -53,12 +53,12 @@ class MessageForm extends Component {
   };
 
   sendMessage = () => {
-    const { messagesRef, currentChannel } = this.props;
+    const { getMessagesRef, currentChannel } = this.props;
     const { message, errors } = this.state;
 
     if (message) {
       this.setState({ loading: true });
-      messagesRef
+      getMessagesRef()
         .child(currentChannel.id)
         .push()
         .set(this.createMessage())
@@ -74,10 +74,20 @@ class MessageForm extends Component {
     }
   };
 
+  getPath = () => {
+    const { isPrivateChannel, currentChannel } = this.props;
+    if (isPrivateChannel) {
+      return `chat/private-${currentChannel.id}`;
+    } else {
+      return "chat/public";
+    }
+  };
+
   uploadFile = (file, metadata) => {
-    const { currentChannel, messagesRef } = this.props;
+    const { currentChannel, getMessagesRef } = this.props;
     const pathToUpload = currentChannel.id;
-    const filePath = `chat/public/${uuidv4()}.jpg`;
+    const ref = getMessagesRef();
+    const filePath = `${this.getPath()}/${uuidv4()}.jpg`;
 
     this.setState(
       {
@@ -106,7 +116,7 @@ class MessageForm extends Component {
             uploadTask.snapshot.ref
               .getDownloadURL()
               .then(downloadUrl => {
-                this.sendFileMessage(downloadUrl, messagesRef, pathToUpload);
+                this.sendFileMessage(downloadUrl, ref, pathToUpload);
               })
               .catch(err => {
                 console.log(err);
@@ -200,7 +210,7 @@ class MessageForm extends Component {
 
 MessageForm.propTypes = {
   currentChannel: PropTypes.object,
-  messagesRef: PropTypes.object,
+  getMessagesRef: PropTypes.func,
   user: PropTypes.object
 };
 

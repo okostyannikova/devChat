@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import firebase from "../../firebase";
-import debounce from 'lodash.debounce'
+import debounce from "lodash.debounce";
 import { Segment, Comment } from "semantic-ui-react";
 
 import MessagesHeader from "./MessagesHeader";
@@ -12,6 +12,7 @@ class Messages extends Component {
   constructor(props) {
     super(props);
     this.messagesRef = firebase.database().ref("messages");
+    this.privateMessagesRef = firebase.database().ref("privateMessages");
 
     this.state = {
       messages: [],
@@ -19,16 +20,17 @@ class Messages extends Component {
       numUniqueUsers: "",
       searchTerm: "",
       searchLoading: false,
-      searchResults: []
+      searchResults: [],
     };
   }
 
-  componentWillReceiveProps = nextProps => {
-    const { currentChannel, user } = nextProps;
+  componentDidMount() {
+    const { currentChannel, user } = this.props;
+
     if (currentChannel && user) {
       this.addListeners(currentChannel.id);
     }
-  };
+  }
 
   addListeners = channelId => {
     this.addMessageListener(channelId);
@@ -36,14 +38,22 @@ class Messages extends Component {
 
   addMessageListener = channelId => {
     const loadedMessages = [];
-    this.messagesRef.child(channelId).on("child_added", snap => {
+    const ref = this.getMessagesRef();
+
+    ref.child(channelId).on("child_added", snap => {
       loadedMessages.push(snap.val());
+
       this.setState({
         messages: loadedMessages,
         messagesLoading: false
       });
       this.countUniqueUsers(loadedMessages);
-    });
+    }, err => console.log(err));
+  };
+
+  getMessagesRef = () => {
+    const { isPrivateChannel } = this.props;
+    return isPrivateChannel ? this.privateMessagesRef : this.messagesRef;
   };
 
   handleSearchChange = debounce(event => {
@@ -98,11 +108,13 @@ class Messages extends Component {
     );
   };
 
-  displayChannelName = channel => (channel ? channel.name : "");
+  displayChannelName = channel => {
+    const { isPrivateChannel } = this.props;
+    return channel ? `${isPrivateChannel ? "@" : "#"}${channel.name}` : "";
+  };
 
   render() {
-    const { messagesRef } = this;
-    const { currentChannel, user } = this.props;
+    const { currentChannel, user, isPrivateChannel } = this.props;
     const {
       messages,
       numUniqueUsers,
@@ -117,6 +129,7 @@ class Messages extends Component {
           numUniqueUsers={numUniqueUsers}
           handleSearchChange={this.handleSearchChange}
           searchLoading={searchLoading}
+          isPrivateChannel={isPrivateChannel}
         />
 
         <Segment>
@@ -128,9 +141,10 @@ class Messages extends Component {
         </Segment>
 
         <MessageForm
-          messagesRef={messagesRef}
           currentChannel={currentChannel}
           user={user}
+          isPrivateChannel={isPrivateChannel}
+          getMessagesRef={this.getMessagesRef}
         />
       </React.Fragment>
     );
@@ -139,7 +153,8 @@ class Messages extends Component {
 
 Messages.propTypes = {
   currentChannel: PropTypes.object,
-  user: PropTypes.object
+  user: PropTypes.object,
+  isPrivateChannel: PropTypes.bool
 };
 
 export default Messages;
