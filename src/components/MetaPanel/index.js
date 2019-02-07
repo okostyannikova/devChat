@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Segment, Accordion, Header, Icon, Image } from "semantic-ui-react";
+import {
+  Segment,
+  Accordion,
+  Header,
+  Icon,
+  Image,
+  List
+} from "semantic-ui-react";
 
 class MetaPanel extends Component {
   state = {
@@ -14,9 +21,25 @@ class MetaPanel extends Component {
     this.setState({ activeIndex: newIndex });
   };
 
+  displayTopPosters = posts =>
+    Object.entries(posts)
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([key, val], i) => (
+        <List.Item key={i}>
+          <Image avatar src={val.avatar} />
+          <List.Content>
+            <List.Header as="a">{key}</List.Header>
+            <List.Description>
+              {val.count} {val.count === 1 ? "post" : "posts"}
+            </List.Description>
+          </List.Content>
+        </List.Item>
+      ))
+      .slice(0, 5);
+
   render() {
     const { activeIndex } = this.state;
-    const { isPrivateChannel, currentChannel } = this.props;
+    const { isPrivateChannel, currentChannel, userPosts } = this.props;
 
     if (isPrivateChannel) return null;
 
@@ -50,7 +73,7 @@ class MetaPanel extends Component {
             Top Posters
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 1}>
-            posters
+            <List>{userPosts && this.displayTopPosters(userPosts)}</List>
           </Accordion.Content>
 
           <Accordion.Title
@@ -79,6 +102,7 @@ class MetaPanel extends Component {
 
 MetaPanel.propTypes = {
   currentChannel: PropTypes.object,
+  userPosts: PropTypes.object,
   isPrivateChannel: PropTypes.bool
 };
 
