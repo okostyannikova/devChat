@@ -19,7 +19,7 @@ const App = ({ currentUser, currentChannel, isPrivateChannel }) => {
 
       <Grid.Column style={{ marginLeft: 320 }}>
         <Messages
-          key={currentChannel && currentChannel.id}   //changing "key" recreates component
+          key={currentChannel && currentChannel.id}     //changing "key" recreates component
           currentChannel={currentChannel}
           user={currentUser}
           isPrivateChannel={isPrivateChannel}
@@ -27,7 +27,10 @@ const App = ({ currentUser, currentChannel, isPrivateChannel }) => {
       </Grid.Column>
 
       <Grid.Column width={4}>
-        <MetaPanel />
+        <MetaPanel
+          key={currentChannel && currentChannel.id}
+          isPrivateChannel={isPrivateChannel}
+        />
       </Grid.Column>
     </Grid>
   );
